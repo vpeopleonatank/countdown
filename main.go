@@ -76,7 +76,7 @@ func stop() {
 }
 
 func playsound() {
-	f, err := os.Open("./mp3/bell-ringing-01.mp3")
+	f, err := os.Open("/home/vpeopleonatank/mp3/bell-ringing-01.mp3")
 	if err != nil {
 		log.Fatal(err)
 	}
