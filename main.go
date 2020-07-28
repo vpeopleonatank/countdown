@@ -2,10 +2,15 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"time"
 
 	"github.com/nsf/termbox-go"
+
+	"github.com/faiface/beep"
+	"github.com/faiface/beep/mp3"
+	"github.com/faiface/beep/speaker"
 )
 
 const (
@@ -70,6 +75,28 @@ func stop() {
 	ticker.Stop()
 }
 
+func playsound() {
+	f, err := os.Open("./mp3/bell-ringing-01.mp3")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	streamer, format, err := mp3.Decode(f)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer streamer.Close()
+
+	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
+
+	done := make(chan bool)
+	speaker.Play(beep.Seq(streamer, beep.Callback(func() {
+		done <- true
+	})))
+
+	<-done
+}
+
 func countdown(left time.Duration) {
 	var exitCode int
 
@@ -98,6 +125,7 @@ loop:
 	}
 
 	termbox.Close()
+	playsound()
 	if exitCode != 0 {
 		os.Exit(exitCode)
 	}
